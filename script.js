@@ -15,34 +15,32 @@
 // Refactoring to use template 
 
 function setup() {
-  const allEpisodes = getAllEpisodes();                                         // Get all episodes and render on the page
-  makePageForEpisodes(allEpisodes);
+  const allEpisodes = getAllEpisodes();                                                         // Get episode data
+  makePageForEpisodes(allEpisodes);                                                             // Render all episode
 }
 
 function makePageForEpisodes(episodeList) {
   const episodeContainer = document.getElementById("root");
+  document.getElementById("status-message").innerHTML = `<h1>Game of Thrones</h1><p>Total Episodes: ${episodeList.length}</p>`;
 
-  const template = document.getElementById("episode-card-template");            // Get template element for an episode card
+  const template = document.getElementById("episode-card-template");                            // Get template element for an episode card
 
-  episodeContainer.innerHTML = "";                                              // Clear any existing content in the container
+  episodeContainer.innerHTML = "";                                                              // Clear any existing content in the container
 
-  episodeList.forEach(episode => {                                              // Loop through each episode and create a card
-    const episodeCards = template.content.cloneNode(true);                      // Clone the template content
+  const episodeCardsFragment = document.createDocumentFragment();                               // Improve DOM performance by appending in one operation when rendering multiple times
 
-    const episodeTitle = episodeCards.querySelector("h3");                      // Select elements inside the cloned template
-    const seasonNumber = episodeCards.querySelector("[data-season]");
-    const episodeNumber = episodeCards.querySelector("[data-episode]");
-    const summaryText = episodeCards.querySelector("[data-summary]");
+  episodeList.forEach(episode => {                                                              // Loop through each episode and create a card
+    const episodeCards = template.content.cloneNode(true);                                      // Clone the template content
 
+    episodeCards.querySelector("[data-title]").textContent = episode.name;                      // Using custom data attributes clarity and flexibility without relying on tag names 
+    episodeCards.querySelector("[data-season]").textContent = `Season: ${episode.season}`;
+    episodeCards.querySelector("[data-episode]").textContent = `Episode: ${episode.number}`;
+    episodeCards.querySelector("[data-summary]").innerHTML = episode.summary;
 
-    episodeTitle.textContent = episode.name;                                     // Fill in episode data
-    seasonNumber.textContent = `Season: ${episode.season}`;
-    episodeNumber.textContent = `Episode: ${episode.number}`;
-    summaryText.innerHTML = `Episode Summary: ${episode.summary}`;
-
-
-    episodeContainer.appendChild(episodeCards);                                  // Append the filled card to container
+    episodeCardsFragment.appendChild(episodeCards);                                              //  Add each card to the fragment
   });
+
+  episodeContainer.appendChild(episodeCardsFragment);                                            // Add all cards at once for better performance
 }
 
 window.onload = setup;
