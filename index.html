@@ -10,18 +10,20 @@
 </head>
 
 <body>
-  <div id="status-message"></div>
-  
-  <!-- Main content container -->
-  <div id="root"></div> 
+  <div id="main-heading"></div>
+
+  <div id="root"></div><!-- Main content container -->
 
   <!-- Template for episode cards -->
   <template id="episode-card-template">
     <section class="episode-card">
       <h3 data-title>Episode Title</h3>
-      <p data-season>Season</p>
-      <data data-episode>Episode Number</data>
-      <p data-summary>SummaryText</p>
+      <span data-code></span> <!-- New element for episode code -->
+      <p data-season></p>
+      <data data-episode></data>
+      <img data-image alt="Episode image" />
+      <p data-summary>Summary Text</p>
+      <a data-link target="_blank">Link to episode</a>
     </section>
   </template>
 

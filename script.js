@@ -1,46 +1,56 @@
 /*
---------- All episodes must be shown
-2. For each episode, _at least_ following must be displayed:
-   ------ The name of the episode
-   ------ The season number
-   ------ The episode number
-   4. The medium-sized image for the episode
-   ------ The summary text of the episode
-3. Combine season number and episode number into an **episode code**:
-   1. Each part should be zero-padded to two digits.
-   2. Example: `S02E07` would be the code for the 7th episode of the 2nd season. `S2E7` would be incorrect.
-4. Your page should state somewhere that the data has (originally) come from [TVMaze.com](https://tvmaze.com/), and link back to that site (or the specific episode on that site). See [tvmaze.com/api#licensing](https://www.tvmaze.com/api#licensing).
+1. Add the medium-sized image for each episode
+2. Combine season number and episode number into an **episode code**
+     1. Each part should be zero-padded to two digits.
+     2. Example: `S02E07` would be the code for the 7th episode of the 2nd season. `S2E7` would be incorrect.
+3. Your page should state somewhere that the data has (originally) come from [TVMaze.com](https://tvmaze.com/), and link back to that site (or the specific episode on that site). See [tvmaze.com/api#licensing](https://www.tvmaze.com/api#licensing).
 */
 
-// Refactoring to use template 
-
 function setup() {
-  const allEpisodes = getAllEpisodes();                                                         // Get episode data
-  makePageForEpisodes(allEpisodes);                                                             // Render all episode
+  const allEpisodes = getAllEpisodes();
+  makePageForEpisodes(allEpisodes);
 }
 
 function makePageForEpisodes(episodeList) {
   const episodeContainer = document.getElementById("root");
-  document.getElementById("status-message").innerHTML = `<h1>Game of Thrones</h1><p>Total Episodes: ${episodeList.length}</p>`;
+  document.getElementById("main-heading").innerHTML = `<h1>Game of Thrones</h1><p>Total Episodes: ${episodeList.length}</p>`;
 
-  const template = document.getElementById("episode-card-template");                            // Get template element for an episode card
+  const template = document.getElementById("episode-card-template");
 
-  episodeContainer.innerHTML = "";                                                              // Clear any existing content in the container
+  episodeContainer.innerHTML = "";
 
-  const episodeCardsFragment = document.createDocumentFragment();                               // Improve DOM performance by appending in one operation when rendering multiple times
+  const episodeCardsFragment = document.createDocumentFragment();
 
-  episodeList.forEach(episode => {                                                              // Loop through each episode and create a card
-    const episodeCards = template.content.cloneNode(true);                                      // Clone the template content
+  episodeList.forEach(episode => {
+    const episodeCards = template.content.cloneNode(true);
 
-    episodeCards.querySelector("[data-title]").textContent = episode.name;                      // Using custom data attributes clarity and flexibility without relying on tag names 
-    episodeCards.querySelector("[data-season]").textContent = `Season: ${episode.season}`;
-    episodeCards.querySelector("[data-episode]").textContent = `Episode: ${episode.number}`;
-    episodeCards.querySelector("[data-summary]").innerHTML = episode.summary;
+    episodeCards.querySelector("[data-title]").textContent = episode.name;
 
-    episodeCardsFragment.appendChild(episodeCards);                                              //  Add each card to the fragment
+    const season = episode.season.toString().padStart(2, "0");                                 // Convert episode and season numbers to strings and pad with leading zeros
+    const number = episode.number.toString().padStart(2, "0");
+    episodeCards.querySelector("[data-code]").textContent = `S${season}E${number}`;            // Select element with [data-code] attribute and set its text content to formatted season-episode code
+
+    episodeCards.querySelector("[data-summary]").innerHTML = `Summary: ${episode.summary}`;
+
+    const episodeLink = episodeCards.querySelector("[data-link]");
+    episodeLink.href = episode.url;
+
+    const episodeImg = episodeCards.querySelector("[data-image]");                              // Select image element inside cloned episode template
+    if (episode.image && episode.image.medium) {                                                // Check if episode object has an image property AND contains a medium image version
+      episodeImg.src = episode.image.medium;                                                    // Set the image source to the episode's medium image from episode data
+      episodeImg.alt = episode.name;                                                            // Set the alt text to the episode name for accessibility
+    } else {                                                                                    // Handle case where image doesn't exist or is missing
+      episodeImg.remove();                                                                      // If no image found- remove the placeholder <img> element from the DOM
+    }
+    
+    episodeCardsFragment.appendChild(episodeCards);
   });
 
-  episodeContainer.appendChild(episodeCardsFragment);                                            // Add all cards at once for better performance
+  const dataAttribution = document.createElement("p");                                           // Adding element to give credit to external data source: clickable link at top of page
+  dataAttribution.innerHTML = 'Data originally from <a href="https://tvmaze.com/" target="_blank">TVMaze.com</a>';
+  document.getElementById("root").appendChild(dataAttribution);
+
+  episodeContainer.appendChild(episodeCardsFragment);
 }
 
 window.onload = setup;
