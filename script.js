@@ -41,7 +41,8 @@ function createEpisodeCard(episode) {
 
   const episodeLink = episodeCard.querySelector("[data-link]");
   episodeLink.href = episode.url;
-  return episodeCard;                                                                       // Return DOM node for episode
+  
+  return episodeCard;                                                                       
 }
 
 window.onload = setup;
