@@ -11,17 +11,23 @@
   <body>
     <div id="main-heading"></div>
 
-    <!-- Adding the input field -->
-    <label class="search-label">
-      Search episodes:
-      <input type="text" id="search-input" placeholder="Your search term..." />
-    </label>
-    <p id="search-count"></p>
+    <div id="controls">
+      <!-- Adding the input field -->
+      <label class="search-label">
+        Search episodes:
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Your search term..."
+        />
+      </label>
 
-    <!-- Episode selector -->
-    <select id="episode-select">
-      <option value="all">All Episodes</option>
-    </select>
+      <!-- Episode selector -->
+      <select id="episode-select">
+        <option value="all">Show All Episodes</option>
+      </select>
+      <p id="search-count"></p>
+    </div>
 
     <div id="root"></div>
     <!-- Main content container -->
