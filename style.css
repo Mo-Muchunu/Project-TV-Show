@@ -13,8 +13,31 @@ body {
   margin-top: 0.5rem;
 }
 
+/* Wrap search + selector together for alignment */
+#controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Style the input and selector */
+#search-input,
+#episode-select {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
 /* Add style to search count to display it clearly on a black background*/
 #search-count {
+  width: 100%;
   color: #f0f0f0;
   font-weight: bold;
 }
