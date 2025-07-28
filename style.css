@@ -1,5 +1,5 @@
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 2rem;
   background-color: #080808;
@@ -7,10 +7,27 @@ body {
 
 #main-heading {
   text-align: center;
-  color:#f0f0f0;
+  color: #f0f0f0;
   font-size: 1.9rem;
   margin-bottom: 2rem;
-  margin-top: 0.5rem
+  margin-top: 0.5rem;
+}
+
+/* Add style to search count to display it clearly on a black background*/
+#search-count {
+  color: #f0f0f0;
+  font-weight: bold;
+}
+
+/* Add style to search label to display it clearly on a black background*/
+.search-label {
+  color: #f0f0f0;
+  font-style: italic;
+}
+
+/* Add style to the paragraph text before the data attribution link to display it clearly on a black background */
+p {
+  color: #f0f0f0;
 }
 
 #root {
@@ -59,7 +76,6 @@ body {
   color: #333;
   flex-grow: 1;
 }
-
 
 [data-link] {
   display: block;
