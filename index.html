@@ -1,34 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TV Show Project | Mo (Mo-Muchunu)</title>
+    <link href="style.css" rel="stylesheet" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TV Show Project | Mo (Mo-Muchunu)</title>
-  <link href="style.css" rel="stylesheet" />
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-</head>
+  <body>
+    <div id="main-heading"></div>
 
-<body>
-  <div id="main-heading"></div>
+    <div id="controls">
+      <!-- Adding the input field -->
+      <label class="search-label">
+        Search episodes:
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Your search term..."
+        />
+      </label>
 
-  <div id="root"></div><!-- Main content container -->
+      <!-- Episode selector -->
+      <select id="episode-select">
+        <option value="all">Show All Episodes</option>
+      </select>
+      <p id="search-count"></p>
+    </div>
 
-  <!-- Template for episode cards -->
-  <template id="episode-card-template">
-    <section class="episode-card">
-      <h3 data-title></h3>
-      <img data-image alt="Episode image" />
-      <p data-summary></p>
-      <a data-link target="_blank">Link to episode</a>
-    </section>
-  </template>
+    <div id="root"></div>
+    <!-- Main content container -->
 
-  <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
-  <script defer src="episodes.js"></script>
+    <!-- Template for episode cards -->
+    <template id="episode-card-template">
+      <section class="episode-card">
+        <h3 data-title></h3>
+        <img data-image alt="Episode image" />
+        <p data-summary></p>
+        <a data-link target="_blank">Link to episode</a>
+      </section>
+    </template>
 
-  <!-- Loads YOUR javascript code -->
-  <script defer src="script.js"></script>
-</body>
+    <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
+    <script defer src="episodes.js"></script>
 
+    <!-- Loads YOUR javascript code -->
+    <script defer src="script.js"></script>
+  </body>
 </html>
