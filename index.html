@@ -1,51 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TV Show Project | Mo (Mo-Muchunu)</title>
-    <link href="style.css" rel="stylesheet" />
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  </head>
 
-  <body>
-    <div id="main-heading"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TV Show Project | Mo (Mo-Muchunu)</title>
+  <link href="style.css" rel="stylesheet" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+</head>
 
-    <div id="controls">
-      <!-- Adding the input field -->
-      <label class="search-label">
-        Search episodes:
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Your search term..."
-        />
+<body>
+  <div id="main-heading"></div>
+  <section id="controls">
+    <div>
+      <label id="search-label">
+        Search Episodes:
+        <input id="search-input" type="text" placeholder="Your search term..." />
       </label>
-
-      <!-- Episode selector -->
+    </div>
+    <div>
       <select id="episode-select">
         <option value="all">Show All Episodes</option>
       </select>
-      <p id="search-count"></p>
+      <span id="search-count"></span>
     </div>
+  </section>
 
-    <div id="root"></div>
-    <!-- Main content container -->
+  <div id="root">
+    <!-- Main content container for episode cards -->
+  </div>
+  
+  <template id="episode-card-template">
+    <article class="episode-card">
+      <h2 data-title></h2>
+      <img data-image alt="Episode image" />
+      <h3 data-episode-number></h3>
+      <p data-summary></p>
+    </article>
+  </template>
 
-    <!-- Template for episode cards -->
-    <template id="episode-card-template">
-      <section class="episode-card">
-        <h3 data-title></h3>
-        <img data-image alt="Episode image" />
-        <p data-summary></p>
-        <a data-link target="_blank">Link to episode</a>
-      </section>
-    </template>
+  <!-- Loads YOUR javascript code -->
+  <script defer src="script.js"></script>
 
-    <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
-    <script defer src="episodes.js"></script>
+  <!-- Footer for data attribution -->
+  <div id="footer"></div>
 
-    <!-- Loads YOUR javascript code -->
-    <script defer src="script.js"></script>
-  </body>
+</body>
+
 </html>

@@ -1,54 +1,79 @@
-// Global state to store all episodes and the current search term
-const state = {
+const state = {                                                                 // Global state object to track all episodes, current search, and dropdown choice
   allEpisodes: [],
   searchTerm: "",
   selectedEpisodeId: "all",
 };
 
-function setup() {
-  state.allEpisodes = getAllEpisodes();
-  searchBox();
-  episodeSelect();
-  render();
+function displayLoadingMessage() {                                              // Display loading message while data fetches
+  const root = document.getElementById("root");
+  root.innerHTML = "<p>Loading episodes, please wait...</p>";
 }
-// This function sets up the search box.
-// When the user types, it updates the search term and re-renders the filtered episode list.
+
+function showErrorNotice(message) {                                             // Show error message if fetch fails
+  const root = document.getElementById("root");
+  root.innerHTML = `<p style="color:red;">${message}</p>`;
+}
+
+function setup() {
+  displayLoadingMessage();                                                      // Show loading message before fetch starts    
+
+  fetch("https://api.tvmaze.com/shows/82/episodes")                             // Fetch episode data from TVMaze API
+    .then((response) => {
+      if (!response.ok) {                                                       // Handle bad response
+        throw new Error(`Failed to fetch episodes: ${response.status} ${response.statusText}`);
+      }
+      return response.json();                                                   // Parse JSON response: raw JSON string converted to usable JavaScript
+    })
+    .then((episodes) => {
+      state.allEpisodes = episodes;
+      searchBox();
+      episodeSelect();
+    })
+    .catch((error) => {
+      showErrorNotice("Failed to load episodes. Please try again later.");
+      console.error("Fetch error:", error);                                     // Log actual error
+    });
+}
+
+// Set up search box
 function searchBox() {
   const searchInput = document.getElementById("search-input");
 
   function operateSearch(event) {
     state.searchTerm = event.target.value.toLowerCase().trim();
-    state.selectedEpisodeId = "all"; // Reset dropdown selection when searching
-    document.getElementById("episode-select").value = "all";
+    state.selectedEpisodeId = "all";
     render();
   }
-
   searchInput.addEventListener("input", operateSearch);
   searchInput.addEventListener("keyup", operateSearch);
 }
 
-// This function creates a dropdown to select a specific episode
+function formatEpisodeCode(episode) {                                           // Isolated this function to be used globally, avoiding duplication
+  const season = episode.season.toString().padStart(2, "0");                    // Was also used in episodeSelect and createEpisodeCard
+  const number = episode.number.toString().padStart(2, "0");
+  return `S${season}E${number}`;
+}
+
+// Dropdown for specific episode
 function episodeSelect() {
   const select = document.getElementById("episode-select");
 
   state.allEpisodes.forEach((episode) => {
-    const season = episode.season.toString().padStart(2, "0");
-    const number = episode.number.toString().padStart(2, "0");
     const option = document.createElement("option");
     option.value = episode.id;
-    option.textContent = `S${season}E${number} - ${episode.name}`;
+    option.textContent = `${formatEpisodeCode(episode)} - ${episode.name}`;
     select.appendChild(option);
   });
 
-  select.addEventListener("change", (event) => {
+  select.addEventListener("change", (event) => {                                // Attach event after dropdown is filled
     state.selectedEpisodeId = event.target.value;
-    state.searchTerm = ""; // Clear search
+    state.searchTerm = "";
     document.getElementById("search-input").value = "";
-    render();
+    render();                                                                   // Re-render based on selected episode
   });
+  render();                                                                     // Initial render on load 
 }
 
-// This function filters and displays episodes by name or summary (case-insensitive)
 function render() {
   let filteredEpisodes;
 
@@ -61,68 +86,69 @@ function render() {
       const nameMatch = episode.name.toLowerCase().includes(state.searchTerm);
       let summaryMatch = false;
       if (episode.summary) {
-        const lowerSummary = episode.summary.toLowerCase();
-        summaryMatch = lowerSummary.includes(state.searchTerm);
+        summaryMatch = episode.summary.toLowerCase().includes(state.searchTerm);
       }
-
       return nameMatch || summaryMatch;
     });
   }
-  // Create and display the filtered episode cards
-  makePageForEpisodes(filteredEpisodes);
-
-  // Show how many episodes matched the search
-  updateCountDisplay(filteredEpisodes.length, state.allEpisodes.length);
+  makePageForEpisodes(filteredEpisodes);                                        // Render filtered list
+  updateCountDisplay(filteredEpisodes.length, state.allEpisodes.length);        // Update matched episode count
 }
 
-// Display how many episodes are currently shown
-function updateCountDisplay(filteredCount, totalCount) {
+// Print current number of episodes displayed
+function updateCountDisplay(filteredCount) {
   const countDisplay = document.getElementById("search-count");
-  countDisplay.textContent = `Displaying ${filteredCount} of ${totalCount} episodes`;
+  if (filteredCount === 1) {
+    countDisplay.textContent = "1 Episode";                                     // Singular count display
+  } else {
+    countDisplay.textContent = `${filteredCount} Episodes`;
+  }
 }
 
 function makePageForEpisodes(episodeList) {
   const episodeContainer = document.getElementById("root");
   episodeContainer.innerHTML = "";
 
-  document.getElementById(
-    "main-heading"
-  ).innerHTML = `<h1>Game of Thrones</h1>`; // Removed episode count from heading for cleaner styling
+  document.getElementById("main-heading").innerHTML = `<h1>Game of Thrones</h1>`;
 
   const episodeCard = episodeList.map(createEpisodeCard);
-
   episodeContainer.append(...episodeCard);
 
-  const dataAttribution = document.createElement("p");
-  dataAttribution.innerHTML =
-    'Data originally from <a href="https://tvmaze.com/" target="_blank">TVMaze.com</a>';
-  episodeContainer.appendChild(dataAttribution);
-}
+  function createEpisodeCard(episode) {
+    const episodeCard = document.getElementById("episode-card-template").content.cloneNode(true);
 
-function createEpisodeCard(episode) {
-  const template = document.getElementById("episode-card-template");
-  const episodeCard = template.content.cloneNode(true);
+    const title = episodeCard.querySelector("[data-title]");
+    title.textContent = episode.name;
 
-  const season = episode.season.toString().padStart(2, "0");
-  const number = episode.number.toString().padStart(2, "0");
-  episodeCard.querySelector(
-    "[data-title]"
-  ).textContent = `${episode.name} – S${season}E${number}`; // Combined title and episode code into a single line to simplify layout and improve readability
+    const episodeCode = formatEpisodeCode(episode);
+    const episodeNumber = episodeCard.querySelector("[data-episode-number]");
 
-  episodeCard.querySelector("[data-summary]").innerHTML = episode.summary; // Removed "Summary:" label prefix to keep content presentation minimal
+    const episodeLink = document.createElement("a");
+    episodeLink.href = episode.url;
+    episodeLink.textContent = episodeCode;                                      // Combining episode code and link for cleaner layout
+    episodeLink.target = "_blank";
+    episodeLink.rel = "noopener noreferrer";
+    episodeNumber.textContent = "";
+    
+    episodeNumber.appendChild(episodeLink);                                     // Append link to episode number element
 
-  const episodeImg = episodeCard.querySelector("[data-image]");
-  if (episode.image && episode.image.medium) {
-    episodeImg.src = episode.image.medium;
-    episodeImg.alt = episode.name;
-  } else {
-    episodeImg.remove();
+    episodeCard.querySelector("[data-summary]").innerHTML =
+      episode.summary || "<em>No summary available.</em>";                      // Display message if API data missing
+
+    const episodeImg = episodeCard.querySelector("[data-image]");
+    if (episode.image && episode.image.medium) {
+      episodeImg.src = episode.image.medium;
+      episodeImg.alt = episode.name;
+    } else {
+      episodeImg.remove();
+    }
+    return episodeCard;
   }
 
-  const episodeLink = episodeCard.querySelector("[data-link]");
-  episodeLink.href = episode.url;
-
-  return episodeCard;
+  const dataAttribution = document.getElementById("footer");                    // Data attribution in footer element for better structure
+  dataAttribution.innerHTML =
+    `TV Show Project   |   Mo Muchunu   |   Data originally from <a href="https://tvmaze.com/" target="_blank">TVMaze.com</a>`;
+  document.body.appendChild(dataAttribution);
 }
 
 window.onload = setup;
