@@ -51,7 +51,7 @@ async function setup() {
 // Fill the show dropdown menu
 function populateShowSelect() {
   const showSelect = document.getElementById("show-select");
-  showSelect.innerHTML = `<option value="">Select a show...</option>`;
+  showSelect.innerHTML = `<option disabled>Select a show...</option>`;
 
   state.allShows.forEach((show) => {
     const option = document.createElement("option");
@@ -59,6 +59,14 @@ function populateShowSelect() {
     option.textContent = show.name;
     showSelect.appendChild(option);
   });
+
+  // Automatically select the first real show
+  if (state.allShows.length > 0) {
+    const firstShowId = state.allShows[0].id;
+    showSelect.value = firstShowId;
+    state.selectedShowId = firstShowId;
+    fetchEpisodesForShow(firstShowId);
+  }
 
   showSelect.addEventListener("change", (e) => {
     const showId = e.target.value;
