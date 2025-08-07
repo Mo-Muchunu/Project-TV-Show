@@ -1,50 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TV Show Project | Mo (Mo-Muchunu)</title>
+    <link href="style.css" rel="stylesheet" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TV Show Project | Mo (Mo-Muchunu)</title>
-  <link href="style.css" rel="stylesheet" />
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-</head>
-
-<body>
-  <div id="main-heading"></div>
-  <section id="controls">
-    <div>
+  <body>
+    <div id="main-heading"></div>
+    <section id="controls">
+      <!-- Search Episodes -->
       <label id="search-label">
         Search Episodes:
-        <input id="search-input" type="text" placeholder="Your search term..." />
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Your search term..."
+        />
       </label>
-    </div>
-    <div>
-      <select id="episode-select">
-        <option value="all">Show All Episodes</option>
-      </select>
+
+      <!-- Select Show -->
+      <label id="show-label">
+        Select Show:
+        <select id="show-select">
+          <option value="">Loading shows...</option>
+        </select>
+      </label>
+
+      <!-- Select Episode -->
+      <label id="episode-label">
+        Select Episode:
+        <select id="episode-select">
+          <option value="all">Show All Episodes</option>
+        </select>
+      </label>
+
       <span id="search-count"></span>
+    </section>
+
+    <div id="root">
+      <!-- Main content container for episode cards -->
     </div>
-  </section>
 
-  <div id="root">
-    <!-- Main content container for episode cards -->
-  </div>
-  
-  <template id="episode-card-template">
-    <article class="episode-card">
-      <h2 data-title></h2>
-      <img data-image alt="Episode image" />
-      <h3 data-episode-number></h3>
-      <p data-summary></p>
-    </article>
-  </template>
+    <template id="episode-card-template">
+      <article class="episode-card">
+        <h2 data-title></h2>
+        <img data-image alt="Episode image" />
+        <h3 data-episode-number></h3>
+        <p data-summary></p>
+      </article>
+    </template>
 
-  <!-- Loads YOUR javascript code -->
-  <script defer src="script.js"></script>
+    <!-- Loads YOUR javascript code -->
+    <script defer src="script.js"></script>
 
-  <!-- Footer for data attribution -->
-  <div id="footer"></div>
-
-</body>
-
+    <!-- Footer for data attribution -->
+    <div id="footer"></div>
+  </body>
 </html>
