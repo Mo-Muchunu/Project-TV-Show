@@ -10,7 +10,7 @@ body {
   min-height: 100vh;
 }
 
-#main-heading {
+#page-heading {
   text-align: center;
   color: #f0f0f0;
   font-size: 1.9rem;
@@ -178,6 +178,23 @@ label,
   font-size: 0.95rem;
   line-height: 1.4;
   color: #333;
+}
+
+#back-to-shows {
+  color:  #413e3f;
+  border: none;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease;
+}
+
+#back-to-shows:hover {
+  color: #e24195;
 }
 
 #footer {
