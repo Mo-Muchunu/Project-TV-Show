@@ -1,62 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TV Show Project | Mo (Mo-Muchunu)</title>
-    <link href="style.css" rel="stylesheet" />
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  </head>
-
-  <body>
-    <div id="main-heading"></div>
-    <section id="controls">
-      <!-- Search Episodes -->
-      <label id="search-label">
-        Search Episodes:
-        <input
-          id="search-input"
-          type="text"
-          placeholder="Your search term..."
-        />
-      </label>
-
-      <!-- Select Show -->
-      <label id="show-label">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TV Show Project | Mo (Mo-Muchunu)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link 
+  href="https://api.fontshare.com/v2/css?f%5B%5D=boska@900&f%5B%5D=chillax@400,600&f%5B%5D=cabinet-grotesk@300&display=swap" 
+  rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <div id="top-bar">
+    <header id="page-heading"></header>
+    <div id="top-buttons">
+      <button id="refresh-shows" title="Refresh">
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+      <button id="back-to-shows">Back to Shows</button>
+    </div>
+  </div>
+  <nav>
+    <div id="show-controls" style="display: none">
+      <label id="select-a-show">
         Select Show:
         <select id="show-select">
           <option value="">Loading shows...</option>
         </select>
       </label>
-
-      <!-- Select Episode -->
-      <label id="episode-label">
+      <label for="show-search" id="show-label">Filter by:
+        <input id="show-search" type="text" placeholder="title, genre or keyword...">
+      </label>
+      <span id="show-count"></span>
+    </div>
+    <div id="episode-controls" style="display: none">
+      <label id="episode-an-episode">
         Select Episode:
         <select id="episode-select">
           <option value="all">Show All Episodes</option>
         </select>
       </label>
-
+      <label for="episode-search" id="episode-label">Search Episodes:
+        <input id="episode-search" type="text" placeholder="Your search term...">
+      </label>
       <span id="search-count"></span>
-    </section>
-
-    <div id="root">
-      <!-- Main content container for episode cards -->
     </div>
+  </nav>
 
-    <template id="episode-card-template">
-      <article class="episode-card">
-        <h2 data-title></h2>
-        <img data-image alt="Episode image" />
-        <h3 data-episode-number></h3>
-        <p data-summary></p>
-      </article>
-    </template>
+  <div id="root">
+    <!-- Main content container -->
+  </div>
 
-    <!-- Loads YOUR javascript code -->
-    <script defer src="script.js"></script>
+  <template id="episode-card-template">
+    <article class="episode-card">
+      <h2 data-title></h2>
+      <img data-image alt="Episode image">
+      <h3 data-episode-number></h3>
+      <p data-summary></p>
+    </article>
+  </template>
 
-    <!-- Footer for data attribution -->
-    <div id="footer"></div>
-  </body>
+  <!-- Loads YOUR javascript code -->
+  <script defer src="script.js"></script>
+
+  <div id="footer"></div>
+</body>
 </html>
