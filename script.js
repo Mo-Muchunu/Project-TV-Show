@@ -36,14 +36,6 @@ async function setup() {
   } catch (error) {
     console.error("Fetch error:", error);
     showErrorNotice("Failed to load shows list. Please try again later.");
-
-    // Refresh the shows list by clearing filters and re-rendering
-    document.getElementById("refresh-shows").addEventListener("click", () => {
-      state.searchTerm = "";
-      document.getElementById("show-search").value = "";
-      document.getElementById("show-select").value = "";
-      renderShows();
-    });
   }
 }
 
@@ -59,7 +51,7 @@ function populateShowSelect() {
     showSelect.appendChild(option);
   });
 
-  showSelect.addEventListener("change", (e) => {                             
+  showSelect.addEventListener("change", (e) => {
     const showId = e.target.value;
     if (!showId) {
       return;
@@ -114,6 +106,14 @@ function renderShows() {
   document.getElementById("back-to-shows").style.display = "none";
   document.getElementById("show-controls").style.display = "flex";
   document.getElementById("refresh-shows").style.display = "inline-flex";
+
+  // Refresh the shows list by clearing filters and re-rendering
+  document.getElementById("refresh-shows").addEventListener("click", () => {
+    state.searchTerm = "";
+    document.getElementById("show-search").value = "";
+    document.getElementById("show-select").value = "";
+    renderShows();
+  });
 
   root.className = "shows-view";                                             // Set root element class to use the shows page layout
   root.innerHTML = "";

@@ -283,6 +283,7 @@ h2.show-title {
   z-index: 1000;
 }
 
+/* --- ERROR MESSAGES --- */
 .loading {
   font-size: 1.2rem;
   color: #555;
