@@ -5,16 +5,17 @@ const state = {
   selectedShowId: null,
   episodeCache: new Map(),
   showCache: [],
-  view: "shows",                                                                    // UI mode "shows" page view
+  view: "shows",
 };
 
+// Cache root element for reuse globally
+const root = document.getElementById("root");
+
 function displayLoadingMessage() {
-  const root = document.getElementById("root");
-  root.innerHTML = "<p class='loading'>Loading, please wait...</p>";                // Added class for styling
+  root.innerHTML = "<p class='loading'>Loading, please wait...</p>";
 }
 
 function showErrorNotice(message) {
-  const root = document.getElementById("root");
   root.innerHTML = `<p style="color:red;">${message}</p>`;
 }
 
@@ -29,12 +30,46 @@ async function setup() {
 
     shows.sort((a, b) => a.name.localeCompare(b.name));
     state.showCache = shows;
+    populateShowSelect();                                                    // Fill the dropdown with all shows
+    updateShowHeading();                                                     // Immediately refresh the heading when show changes
     renderShows();
-    updateShowHeading();                                                            // Set heading to "TV Shows" on initial load
   } catch (error) {
     console.error("Fetch error:", error);
     showErrorNotice("Failed to load shows list. Please try again later.");
+
+    // Refresh the shows list by clearing filters and re-rendering
+    document.getElementById("refresh-shows").addEventListener("click", () => {
+      state.searchTerm = "";
+      document.getElementById("show-search").value = "";
+      document.getElementById("show-select").value = "";
+      renderShows();
+    });
   }
+}
+
+// Handle dropdown selection
+function populateShowSelect() {
+  const showSelect = document.getElementById("show-select");
+  showSelect.innerHTML = "<option value=\"\">Select a show...</option>";
+
+  state.showCache.forEach((show) => {
+    const option = document.createElement("option");
+    option.value = show.id;
+    option.textContent = show.name;
+    showSelect.appendChild(option);
+  });
+
+  showSelect.addEventListener("change", (e) => {                             
+    const showId = e.target.value;
+    if (!showId) {
+      return;
+    }
+    state.selectedShowId = showId;
+    state.selectedEpisodeId = "all";
+    state.searchTerm = "";
+    document.getElementById("episode-search").value = "";
+    fetchEpisodesForShow(showId);
+  });
 }
 
 function formatEpisodeCode(episode) {
@@ -43,16 +78,15 @@ function formatEpisodeCode(episode) {
   return `S${season}E${episodeNumber}`;
 }
 
-
 document.getElementById("show-search").addEventListener("input", (e) => {
   state.searchTerm = e.target.value.toLowerCase().trim();
   renderShows();
 });
 
 function updateShowHeading(showId) {
-  const heading = document.getElementById("page-heading");                          // Changed to more descriptive id
+  const heading = document.getElementById("page-heading");
   if (!showId) {
-    heading.innerHTML = `<h1>TV Shows</h1>`;
+    heading.innerHTML = "<h1>TV Shows</h1>";
     return;
   }
 
@@ -64,21 +98,24 @@ function updateShowHeading(showId) {
 
 function updateShowCount(filteredShows, totalCount = state.showCache.length) {
   const showsDisplayed = document.getElementById("show-count");
-  showsDisplayed.textContent = `${filteredShows.length} of ${totalCount} Shows`;    // Wording tweak
+  showsDisplayed.textContent = `${filteredShows.length} of ${totalCount} Shows`;
 }
 
 function updateEpisodeCount(filteredEpisodes = state.allEpisodes.length) {
   const episodesFound = document.getElementById("search-count");
-  episodesFound.textContent = `${filteredEpisodes.length} episode${filteredEpisodes.length !== 1 ? "s" : ""}`;
+  episodesFound.textContent = `${filteredEpisodes.length} Episode${filteredEpisodes.length !== 1 ? "s" : ""}`;
 }
 
 function renderShows() {
   state.view = "shows";
-  document.getElementById("controls").style.display = "none";                       // Hide episode search in shows view
-  document.getElementById("back-to-shows").style.display = "none";                  // Hide back button in shows view
-  document.getElementById("show-filter-bar").style.display = "flex";                // Display show-search bar when shows view re-renders
 
-  const root = document.getElementById("root");
+  // Hide episode controls and display show controls
+  document.getElementById("episode-controls").style.display = "none";
+  document.getElementById("back-to-shows").style.display = "none";
+  document.getElementById("show-controls").style.display = "flex";
+  document.getElementById("refresh-shows").style.display = "inline-flex";
+
+  root.className = "shows-view";                                             // Set root element class to use the shows page layout
   root.innerHTML = "";
 
   const filteredShows = state.showCache.filter((show) => {
@@ -91,23 +128,31 @@ function renderShows() {
       genres.includes(state.searchTerm)
     );
   });
+
   updateShowCount(filteredShows);
 
   filteredShows.forEach((show) => {
-    const showCard = document.createElement("div");
+    const showCard = document.createElement("section");
+    const star = '<i class="fa-solid fa-star" style="color: gold;"></i>';    // Reusable gold star icon for show ratings
     showCard.className = "show-card";
     showCard.innerHTML = `
-      <h2>${show.name}</h2>
-      <img src="${show.image?.medium || ""}" alt="${show.name}" />
-      
+    <h2 class="show-title">${show.name}</h2>
+    <div class="show-card-content">
+      <div>
+        <img src="${show.image?.medium || ""}" alt="${show.name || "No image available"}">
+      </div>
+      <div class="summary-and-details">
       <p>${show.summary || "<em>No summary</em>"}</p>
-      <ul>
-        <li><strong>Genres:</strong> ${show.genres.join(", ")}</li>
-        <li><strong>Status:</strong> ${show.status}</li>
-        <li><strong>Rating:</strong> ${show.rating.average || "N/A"}</li>
-        <li><strong>Runtime:</strong> ${show.runtime || "?"} min</li>
-      </ul>
+      <div class="show-details">
+          <p class="rating"><strong>Rating:</strong> ${star}${show.rating?.average ?? "N/A"}</p>
+          <p class="genres"><strong>Genres:</strong> ${show.genres.join(" | ")}</p>
+          <p class="status"><strong>Status:</strong> ${show.status}</p>
+          <p class="runtime"><strong>Runtime:</strong> ${show.runtime ?? "?"} min</p>
+        </div>
+      </div>
+    </div>
     `;
+
     showCard.addEventListener("click", () => fetchEpisodesForShow(show.id));
     root.appendChild(showCard);
   });
@@ -117,11 +162,13 @@ async function fetchEpisodesForShow(showId) {
   state.selectedShowId = showId;
   state.selectedEpisodeId = "all";
   state.searchTerm = "";
-  document.getElementById("search-input").value = "";
+  document.getElementById("episode-search").value = "";
 
-  document.getElementById("controls").style.display = "flex";                       // Display episode search in episodes view
-  document.getElementById("back-to-shows").style.display = "inline";                // Show back button only in episodes view
-  document.getElementById("show-filter-bar").style.display = "none";                // Hide show search in episodes view
+  // Show episode filters + back button, hide show controls
+  document.getElementById("episode-controls").style.display = "flex";
+  document.getElementById("back-to-shows").style.display = "inline";
+  document.getElementById("show-controls").style.display = "none";
+  document.getElementById("refresh-shows").style.display = "none";
 
   if (state.episodeCache.has(showId)) {
     state.allEpisodes = state.episodeCache.get(showId);
@@ -132,8 +179,10 @@ async function fetchEpisodesForShow(showId) {
   try {
     displayLoadingMessage();
     const response = await fetch(`https://api.tvmaze.com/shows/${showId}/episodes`);
-    if (!response.ok) throw new Error(
-      `Failed to fetch episodes: ${response.status} ${response.statusText}`);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch episodes: ${response.status} ${response.statusText}`);
+    }
     const episodes = await response.json();
     state.episodeCache.set(showId, episodes);
     state.allEpisodes = episodes;
@@ -148,7 +197,7 @@ async function fetchEpisodesForShow(showId) {
 function renderEpisodes() {
   state.view = "episodes";
   const select = document.getElementById("episode-select");
-  select.innerHTML = `<option value="all">Show All Episodes</option>`;
+  select.innerHTML = "<option value=\"all\">Show All Episodes</option>";
 
   state.allEpisodes.forEach((episode) => {
     const option = document.createElement("option");
@@ -157,25 +206,29 @@ function renderEpisodes() {
     select.appendChild(option);
   });
 
+  root.classList.remove("shows-view", "episodes-view");                      // Reset root element by clearing any previous view classes
+  root.classList.add("episodes-view");                                       // Add episodes view class for layout
+  root.innerHTML = "";                                                       // Clear out old shows before rendering episodes
+
   document.getElementById("episode-select").onchange = (e) => {
     state.selectedEpisodeId = e.target.value;
     state.searchTerm = "";
-    document.getElementById("search-input").value = "";
+    document.getElementById("episode-search").value = "";
     renderEpisodesList();
   };
 
-  const input = document.getElementById("search-input");
+  const input = document.getElementById("episode-search");
   input.oninput = (e) => {
     state.searchTerm = e.target.value.toLowerCase().trim();
     state.selectedEpisodeId = "all";
     renderEpisodesList();
   };
+
   renderEpisodesList();
 }
 
 function renderEpisodesList() {
-  const episodeContainer = document.getElementById("root");
-  episodeContainer.innerHTML = "";
+  root.innerHTML = "";
 
   let filteredEpisodes = state.allEpisodes;
   if (state.selectedEpisodeId !== "all") {
@@ -217,20 +270,21 @@ function renderEpisodesList() {
     }
     root.appendChild(episodeCard);
   });
+
   updateEpisodeCount(filteredEpisodes);
 }
 
-// Back-button
 document.getElementById("back-to-shows").addEventListener("click", () => {
   state.view = "shows";
   renderShows();
-  document.getElementById("back-to-shows").style.display = "none";                  // Hide back button in shows view 
-  document.getElementById("controls").style.display = "none";                       // Hide episode search too
+  document.getElementById("back-to-shows").style.display = "none";
   updateShowHeading();
 });
 
+// Simplified footer text
 const dataAttribution = document.getElementById("footer");
-dataAttribution.innerHTML = `TV Show Project   |   Mo Muchunu   |   Data originally from <a href="https://tvmaze.com/" target="_blank">TVMaze.com</a>`;
+dataAttribution.classList.add("attribution");
+dataAttribution.innerHTML = "Data originally from <a href=\"https://tvmaze.com/\" target=\"_blank\">TVMaze.com</a>";
 document.body.appendChild(dataAttribution);
 
 window.onload = setup;
